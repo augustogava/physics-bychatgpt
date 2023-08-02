@@ -4,9 +4,10 @@ class MainGame {
     startTime;
     followShape = false;
     fallowShapeIndex = undefined;
+    animationRunning = true;
     lastShapeUsed = "CIRCLE";
     mousePosition = new Vector(0, 0);
-
+    resetTime = false;
     scalar = 2 * Utils.randomBoolean1orMinus1();
 
     constructor() {
@@ -20,19 +21,31 @@ class MainGame {
         canvas.height = window.innerHeight;
         canvas.centerX = canvas.width / 2;
         canvas.centerY = canvas.height / 2;
-
-        this.ctx = canvas.getContext("2d");
         this.objs = [];
+        this.prevTime = 0;
+
+        this.debugger = new Debugger();
     }
 
     init() {
-        requestAnimationFrame(this.gameLoop.bind(this));
-
+        this.starLoop();
         this.userInteractions();
+        // this.addObject(new Rectangle(new Vector(22, 444), new Vector(1, 6), 500, 200);
+
+        // this.addObject(new Rectangle(new Vector(100, 0), new Vector(0, 0), 50, 150, 150, 0 /*+ 50*/));
+        // this.addObject(new Rectangle(new Vector(500, 500), new Vector(0, 0), 50, 150, 150, 0 /*+ 50*/));
+    }
+
+    starLoop() {
+        requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     gameLoop(time) {
         this.calculateFPS();
+
+        if ( this.resetTime ) {
+            this.prevTime = time; this.resetTime = false;
+        }
 
         let deltaTime = (time - this.prevTime) * 10;
         this.prevTime = time;
@@ -40,7 +53,10 @@ class MainGame {
         this.update(deltaTime);
         this.draw();
 
-        requestAnimationFrame(this.gameLoop.bind(this));
+        this.debugger.update();
+
+        if (this.animationRunning)
+            requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     update(deltaTime) {
@@ -62,13 +78,14 @@ class MainGame {
     }
 
     draw() {
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.fillText(`FPS: ${this.fps}`, 10, 20);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        this.addText(`${this.fps}`, 10, 20, 15, "white");
 
         for (const obj of this.objs) {
-            obj.draw(this.ctx);
+            obj.draw(ctx);
 
-            if( Globals.isDebug() ){
+            if (Globals.isDebug()) {
                 obj.debug();
             }
         }
@@ -76,13 +93,28 @@ class MainGame {
         this.debug()
     }
 
+    addText(t, x, y, size, color) {
+        ctx.fillStyle = color;
+        ctx.font = `bold ${size}px normal`;
+        ctx.fillText(t, x, y);
+    }
+
     userInteractions() {
+        var that = this;
+        window.addEventListener("blur", function () {
+            // that.pauseGameLoopState();
+        });
+
+        window.addEventListener("focus", function () {
+            // that.resumeGameLoopState();
+        });
+
         canvas.addEventListener("click", event => {
-            this.addShape(this.lastShapeUsed);
+            this.addShape( "CIRCLE");
+            // this.addShape(this.lastShapeUsed);
             this.lastShapeUsed = this.lastShapeUsed == "CIRCLE" ? "SQUARE" : "CIRCLE";
         });
 
-        var that = this;
         document.addEventListener('mousemove', function (mouseMoveEvent) {
             that.mousePosition.x = mouseMoveEvent.pageX;
             that.mousePosition.y = mouseMoveEvent.pageY;
@@ -92,8 +124,13 @@ class MainGame {
 
 
         document.addEventListener('keydown', (event) => {
-            if (event.code != 'KeyB' && event.code != 'KeyR' && event.code != 'KeyF') {
+            if (event.code != 'KeyB' && event.code != 'KeyR' && event.code != 'KeyF' && event.code != 'KeyP') {
                 return;
+            }
+
+
+            if (event.code === 'KeyP') {
+                that.invertGameLoopState();
             }
 
             if (event.code === 'KeyF') {
@@ -115,6 +152,36 @@ class MainGame {
             this.addShape(this.transformCodeToShapeType(event.code));
         });
 
+    }
+
+    resumeGameLoopState() {
+        if(this.animationRunning){
+            return;
+        }
+
+        console.log("resumeGameLoopState");
+
+        this.resetTime = true;
+        this.animationRunning = true;
+        this.starLoop();
+    }
+
+    pauseGameLoopState() {
+        if(!this.animationRunning){
+            return;
+        }
+
+        console.log("pauseGameLoopState");
+        
+        this.animationRunning = false;
+    }
+
+    invertGameLoopState() {
+        if (!this.animationRunning) {
+            this.resetTime = true;
+        }
+        this.animationRunning = !this.animationRunning;
+        this.starLoop();
     }
 
     updateFollowObject() {
@@ -151,11 +218,11 @@ class MainGame {
         if (shapeType == "CIRCLE") {
             this.lastShapeUsed = "CIRCLE";
 
-            this.addObject(new Circle(new Vector(x, y), new Vector(this.scalar * normalizedX, 0), mass, size));
+            this.addObject(new Circle(new Vector(x, y), new Vector(this.scalar * normalizedX, 0), 1, size));
         } if (shapeType == "SQUARE") {
             this.lastShapeUsed = "SQUARE";
 
-            this.addObject(new Rectangle(new Vector(x, y), new Vector(this.scalar * normalizedX, 0), mass, size, size /*+ 50*/));
+            this.addObject(new Rectangle(new Vector(x, y), new Vector(this.scalar * normalizedX, 0), 1, 150, 50));
         }
     }
 
@@ -174,7 +241,10 @@ class MainGame {
         }
     }
 
-    debug(){
-        // this.ctx.fillText("ga", 50, 50);
+    debug() {
+        // if (Globals.isDebug()) {
+        //     this.debugger.draw();
+        // }
+
     }
 }

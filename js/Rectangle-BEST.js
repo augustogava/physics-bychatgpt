@@ -93,7 +93,7 @@ class Rectangle extends Shape {
     const arrowLength = 2 * this.velocity.magnitude();
     const arrowBase = new Vector(this.position.x + this.width / 2, this.position.y + this.height / 2);
     const arrowTip = arrowBase.add(this.velocity.normalize().scale(arrowLength));
-
+  
     ctx.save();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "red";
@@ -121,20 +121,20 @@ class Rectangle extends Shape {
 
     ctx.fillText(
       "normal: " +
-      this.debugData.normal +
-      " distance: " +
-      this.debugData.distance +
-      " massDiff: " +
-      this.debugData.massDiff,
+        this.debugData.normal +
+        " distance: " +
+        this.debugData.distance +
+        " massDiff: " +
+        this.debugData.massDiff,
       this.position.x - 80,
       this.position.y - 15
     );
 
     ctx.fillText(
       "RelaVeloX: " +
-      this.debugData.relativeVelocity.x +
-      "RelaVeloY: " +
-      this.debugData.relativeVelocity.y,
+        this.debugData.relativeVelocity.x +
+        "RelaVeloY: " +
+        this.debugData.relativeVelocity.y,
       this.position.x + this.width,
       this.position.y + this.height / 2
     );
@@ -186,11 +186,11 @@ class Rectangle extends Shape {
 
     ctx.fillText(
       "x: " +
-      this.positionFixed.x +
-      " y: " +
-      this.positionFixed.y +
-      " W: " +
-      this.width,
+        this.positionFixed.x +
+        " y: " +
+        this.positionFixed.y +
+        " W: " +
+        this.width,
       this.position.x,
       this.position.y - 40
     );
@@ -303,142 +303,129 @@ class Rectangle extends Shape {
     });
   }
 
-  // collidesWith(other) {
-  //   if (other instanceof Rectangle) {
-  //     if (SAT.isColliding(this, other)) {
-  //       this.resolveCollisionNewSAT(other);
-  //     }
-  //   } else if (other instanceof Circle) {
-  //   }
-
-  //   const closestX = Utils.clamp(
-  //     this.position.x,
-  //     other.position.x - other.sideLength / 2,
-  //     other.position.x + other.sideLength / 2
-  //   );
-  //   const closestY = Utils.clamp(
-  //     this.position.y,
-  //     other.position.y - other.sideLength / 2,
-  //     other.position.y + other.sideLength / 2
-  //   );
-  //   const distance = Math.sqrt(
-  //     (closestX - this.position.x) * (closestX - this.position.x) +
-  //     (closestY - this.position.y) * (closestY - this.position.y)
-  //   );
-
-  //   const minimumDistance = this.width / 2;
-
-  //   if (distance <= minimumDistance) {
-  //   }
-  // }
-
-  project(shape, axis) {
-    let min = shape[0].dot(axis);
-    let max = min;
-    for (let i = 1; i < shape.length; i++) {
-        let value = shape[i].dot(axis);
-        if (value < min) {
-            min = value;
-        } else if (value > max) {
-            max = value;
-        }
-    }
-    return {min: min, max: max};
-}
-
-  collidesWith(rect2) {
-    if (rect2 instanceof Circle) {
-      return ;
-    }
-        //   if (SAT.isColliding(this, other)) {
-        //     this.resolveCollisionNewSAT(other);
-        //   }
-        // } else if (other instanceof Circle) {
-        // }
-    let r1 = { x: Math.cos(this.angle) * this.width / 2, y: Math.sin(this.angle) * this.width / 2 };
-    
-    let r2 = { x: Math.cos(rect2.angle) * rect2.width / 2, y: Math.sin(rect2.angle) * rect2.width / 2 };
-    
-    let rect1Vertices = [{ x: this.position.x - r1.y, y: this.position.y + r1.x }, { x: this.position.x + r1.y, y: this.position.y - r1.x }, { x: this.position.x + r1.y - r1.x, y: this.position.y - r1.x - r1.y }, { x: this.position.x - r1.y - r1.x, y: this.position.y + r1.x - r1.y }];
-    
-    let rect2Vertices = [{ x: rect2.position.x - r2.y, y: rect2.position.y + r2.x }, { x: rect2.position.x + r2.y, y: rect2.position.y - r2.x }, { x: rect2.position.x + r2.y - r2.x, y: rect2.position.y - r2.x - r2.y }, { x: rect2.position.x - r2.y - r2.x, y: rect2.position.y + r2.x - r2.y }];
-    
-    let mtv = { axis: null, overlap: Infinity };
-    
-    let axes = [{ x: Math.cos(this.angle), y: Math.sin(this.angle) }, { x: Math.cos(this.angle + Math.PI / 2), y: Math.sin(this.angle + Math.PI / 2) }, { x: Math.cos(rect2.angle), y: Math.sin(rect2.angle) }, { x: Math.cos(rect2.angle + Math.PI / 2), y: Math.sin(rect2.angle + Math.PI / 2) }];
-    
-    for (let i = 0; i < axes.length; i++) {
-        let axis = axes[i];
-        let rect1Projection = this.project(rect1Vertices, axis);
-        let rect2Projection = this.project(rect2Vertices, axis);
-        let overlap = Math.min(rect1Projection.max, rect2Projection.max) - Math.max(rect1Projection.min, rect2Projection.min);
-        if (overlap < 0) {
-            return; // No collision found
-        } else if (overlap < mtv.overlap) {
-            mtv.overlap = overlap;
-            mtv.axis = axis;
-            let d = { x: this.position.x - rect2.position.x, y: this.position.y - rect2.position.y };
-            if (dotProduct(d, mtv.axis) < 0) {
-                mtv.axis = {
-                    x: -mtv
-                }
-            }
-        }
+  collidesWith(other) {
+    if (other instanceof Rectangle) {
+      if (SAT.isColliding(this, other)) {
+        this.resolveCollisionNewSAT(other);
+      }
+    } else if (other instanceof Circle) {
     }
 
-    let collisionNormal = { x: mtv.axis.x, y: mtv.axis.y }; //ERROR
-    let collisionPoint = { x: 0, y: 0 };
-    for (let i = 0; i < rect1Vertices.length; i++) {
-        let vertex = rect1Vertices[i];
-        let projection = dotProduct(vertex, collisionNormal) / dotProduct(collisionNormal, collisionNormal);
-        let point = { x: vertex.x - collisionNormal.x * projection, y: vertex.y - collisionNormal.y * projection };
-        collisionPoint.x += point.x;
-        collisionPoint.y += point.y;
+    const closestX = Utils.clamp(
+      this.position.x,
+      other.position.x - other.sideLength / 2,
+      other.position.x + other.sideLength / 2
+    );
+    const closestY = Utils.clamp(
+      this.position.y,
+      other.position.y - other.sideLength / 2,
+      other.position.y + other.sideLength / 2
+    );
+    const distance = Math.sqrt(
+      (closestX - this.position.x) * (closestX - this.position.x) +
+        (closestY - this.position.y) * (closestY - this.position.y)
+    );
+
+    const minimumDistance = this.width / 2;
+
+    if (distance <= minimumDistance) {
     }
+  }
 
-    for (let i = 0; i < rect2Vertices.length; i++) {
-        let vertex = rect2Vertices[i];
-        let projection = dotProduct(vertex, collisionNormal) / dotProduct(collisionNormal, collisionNormal);
-        let point = { x: vertex.x - collisionNormal.x * projection, y: vertex.y - collisionNormal.y * projection };
-        collisionPoint.x += point.x;
-        collisionPoint.y += point.y;
-    }
+  resolveCollisionNewSAT(rect) {
+    // Generate the axes to check for overlap
+    const axes = this.getAxes(rect).concat(rect.getAxes(this));
 
-    collisionPoint.x /= (rect1Vertices.length + rect2Vertices.length);
-    collisionPoint.y /= (rect1Vertices.length + rect2Vertices.length);
+    // let overlap = Number.MAX_VALUE;
+    // let smallestAxis;
 
-    this.resolve(rect2, collisionNormal, collisionPoint);
-}
+    // // Check for overlap on each axis
+    // for (let i = 0; i < axes.length; i++) {
+    //     const axis = axes[i];
+    //     const projection1 = this.project(axis);
+    //     const projection2 = rect.project(axis);
 
-resolve(rect2, collisionNormal, collisionPoint) {
-    let relativeVelocity = {
-      x: rect2.velocity.x - this.velocity.x - (rect2.angularVelocity * rect2.height / 2) + (this.angularVelocity * this.height / 2),
-      y: rect2.velocity.y - this.velocity.y + (rect2.angularVelocity * rect2.width / 2) - (this.angularVelocity * this.width / 2)
-    };
+    //     // Check if the projections overlap
+    //     if (!projection1.getOverlap(projection2)) {
+    //         // If there's no overlap, then there's no collision
+    //         return;
+    //     } else {
+    //         // If there's overlap, determine the amount of overlap
+    //         const currentOverlap = projection1.getOverlap(projection2);
+    //         if (currentOverlap < overlap) {
+    //             overlap = currentOverlap;
+    //             smallestAxis = axis;
+    //         }
+    //     }
+    // }
 
-    // Calculate relative velocity along collision normal
-    let velocityAlongNormal = dotProduct(relativeVelocity, collisionNormal);
+    // const relativeVelocity = this.velocity.sub(rect.velocity);
+    // const collisionNormal = SAT.getCollisionNormal(this, rect);
+    // const impulse = relativeVelocity.projectOnto(collisionNormal);
 
-    // Calculate impulse scalar
-    let impulseScalar = -(1 + this.restitution * rect2.restitution) * velocityAlongNormal /
-      (1 / this.mass + 1 / rect2.mass +
-        Math.pow(crossProduct(collisionPoint, collisionNormal), 2) / this.momentOfInertia +
-        Math.pow(crossProduct(collisionPoint, collisionNormal), 2) / rect2.momentOfInertia);
+    // // const impulseScalar = -(1 + this.physics.restitution) * impulse.magnitude();
+    // const impulseScalar = ( ( impulse.magnitude() ) * this.physics.restitution );
+    // const impulseNormal = collisionNormal.scale(impulseScalar);
 
-    // Apply impulse to objects
-    this.velocity.x -= impulseScalar * collisionNormal.x / this.mass;
-    this.velocity.y -= impulseScalar * collisionNormal.y / this.mass;
-    rect2.velocity.x += impulseScalar * collisionNormal.x / rect2.mass;
-    rect2.velocity.y += impulseScalar * collisionNormal.y / rect2.mass;
+    // this.velocity = this.velocity.add(
+    //   impulseNormal.scale(rect.mass / (rect.mass + this.mass))
+    // );
+    // rect.velocity = rect.velocity.sub(impulseNormal.scale(this.mass / (rect.mass + this.mass)));
 
-    // Calculate torque scalar
-    let torqueScalar1 = crossProduct(collisionPoint, { x: -collisionNormal.y, y: collisionNormal.x });
-    let torqueScalar2 = crossProduct(collisionPoint, { x: collisionNormal.y, y: -collisionNormal.x });
-    let torqueScalar = (torqueScalar1 / this.momentOfInertia) + (torqueScalar2 / rect2.momentOfInertia);
 
-    // Apply torque to objects
-    this.angularVelocity -= impulseScalar * torqueScalar1 / this.momentOfInertia;
-    rect2.angularVelocity += impulseScalar * torqueScalar2 / rect2.momentOfInertia;
+        const normal = SAT.getCollisionNormal(this, rect);
+        const distance = SAT.getCollisionDistance(this.getPoints(), rect.getPoints(), normal);
+
+        const totalMass = this.mass + rect.mass;
+        const massDiff = this.mass - rect.mass;
+        const relativeVelocity = new Vector(
+            rect.velocity.x - this.velocity.x,
+            rect.velocity.y - this.velocity.y
+        );
+
+
+            // Moving the rectangles so they are no longer colliding gay
+        this.position.x += normal.x * distance * massDiff / totalMass;
+        this.position.y += normal.y * distance * massDiff / totalMass;
+        rect.position.x -= normal.x * distance * 2 * rect.mass / totalMass;
+        rect.position.y -= normal.y * distance * 2 * rect.mass / totalMass;
+
+        // Calculating the new velocity and angular velocity after collision
+        const velocityAlongNormal = relativeVelocity.dot(normal);
+        if (velocityAlongNormal > 0) return;
+
+        const impulse = 2 * velocityAlongNormal / totalMass;
+        const impulseX = impulse * normal.x;
+        const impulseY = impulse * normal.y;
+
+        this.velocity.x -= impulseX * rect.mass / totalMass;
+        this.velocity.y -= impulseY * rect.mass / totalMass;
+
+        rect.velocity.x += impulseX * this.mass / totalMass;
+        rect.velocity.y += impulseY * this.mass / totalMass;
+
+
+
+    // Calculate the collision response
+    // const normal = smallestAxis.normalize();
+    // const massDiff = rect.mass / this.mass;
+    // const impulse = normal.multiply(overlap * 2).multiply(massDiff / (1 + massDiff));
+
+    // // Update the velocity of each shape
+    // this.velocity = this.velocity.sub(impulse.multiply(1 / this.mass));
+    // rect.velocity = rect.velocity.add(impulse.multiply(1 / rect.mass));
+
+    // // Calculate relative velocity for friction calculation
+    // const relativeVelocity = rect.velocity.sub(this.velocity);
+    // const rvDotNormal = relativeVelocity.dot(normal);
+
+    // // Check if the objects are moving towards each other
+    // if (rvDotNormal < 0) {
+    //     // Apply friction to their movement
+    //     const frictionImpulse = normal.multiply(relativeVelocity.magnitude()).multiply(-this.physics.friction);
+    //     this.velocity = this.velocity.add(frictionImpulse.multiply(1 / this.mass));
+    //     rect.velocity = rect.velocity.sub(frictionImpulse.multiply(1 / rect.mass));
+    // }
   }
 
   getPoints() {
@@ -448,19 +435,19 @@ resolve(rect2, collisionNormal, collisionPoint) {
     const halfHeight = this.height / 2;
 
     const points = [
-      { x: -halfWidth, y: -halfHeight },
-      { x: halfWidth, y: -halfHeight },
-      { x: halfWidth, y: halfHeight },
-      { x: -halfWidth, y: halfHeight }
+        { x: -halfWidth, y: -halfHeight },
+        { x: halfWidth, y: -halfHeight },
+        { x: halfWidth, y: halfHeight },
+        { x: -halfWidth, y: halfHeight }
     ];
 
     return points.map(point => {
-      return {
-        x: point.x * Math.cos(this.angle) - point.y * Math.sin(this.angle) + x,
-        y: point.x * Math.sin(this.angle) + point.y * Math.cos(this.angle) + y
-      };
+        return {
+            x: point.x * Math.cos(this.angle) - point.y * Math.sin(this.angle) + x,
+            y: point.x * Math.sin(this.angle) + point.y * Math.cos(this.angle) + y
+        };
     });
-  }
+}
 
   projectOnto(vector) {
     const unit = this.velocity.unit();

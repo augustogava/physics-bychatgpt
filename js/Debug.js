@@ -1,93 +1,110 @@
-class Debug {
+class Debugger {
     constructor() {
-        this.fontSize = 18;
-        this.objToDebug = obj;
-        this.fontColor = "red";
+        this.debugDiv = document.getElementById("debug");
+
+        if (Globals.isDebug()) {
+            this.debugDiv.style.display = 'block';
+        }
+
+        this.PROJECTION_STEP = 3;
+
+        this.IGNORE_THRESHOLD = 0
+        this.MAX_LOGS = 1000;
+        this.STEP = .1;
 
         this.history = [];
+        this.historyLog = [];
+
+        var currentTime = Date.now();
     }
 
-    
-      debugRectangle(rectangle) {
-        this.history.push({
-          type: "rectangle",
-          x: rectangle.x,
-          y: rectangle.y,
-          width: rectangle.width,
-          height: rectangle.height,
-          color: rectangle.color,
-          timestamp: Date.now()
-        });
-      }
-    
-      debugBall(ball) {
-        this.history.push({
-          type: "ball",
-          x: ball.x,
-          y: ball.y,
-          radius: ball.radius,
-          color: ball.color,
-          timestamp: Date.now()
-        });
-      }
-    
-      debugSAT(SAT) {
-        this.history.push({
-          type: "SAT",
-          response: SAT.response,
-          timestamp: Date.now()
-        });
-      }
-    
-      drawDebugInformation(canvasContext) {
-        canvasContext.fillStyle = "black";
-        canvasContext.font = "12px Arial";
-        canvasContext.textAlign = "left";
-        canvasContext.textBaseline = "top";
-    
-        this.history.forEach((debugInfo, index) => {
-          let text = `${debugInfo.timestamp}: `;
-          if (debugInfo.type === "rectangle") {
-            text += `Rectangle - x: ${debugInfo.x}, y: ${debugInfo.y}, width: ${debugInfo.width}, height: ${debugInfo.height}, color: ${debugInfo.color}`;
-          } else if (debugInfo.type === "ball") {
-            text += `Ball - x: ${debugInfo.x}, y: ${debugInfo.y}, radius: ${debugInfo.radius}, color: ${debugInfo.color}`;
-          } else if (debugInfo.type === "SAT") {
-            text += `SAT - response: ${JSON.stringify(debugInfo.response)}`;
-          }
-    
-          canvasContext.fillText(text, canvasContext.canvas.width - 200, index * 20);
-        });
-      }
-}
+    getLastLog(id){
+        if( !id ){
+            return false
+        }
 
-// class Debug {
-//     constructor() {
-//       this.debugHistory = [];
-//     }
-  
-//     log(debugInformation) {
-//       this.debugHistory.push(debugInformation);
-//       console.log(debugInformation);
-//     }
-  
-//     draw(canvas) {
-//       // Clear previous debug information
-//       canvas.innerHTML = "";
-    
-//       // Create a div to display the debug information
-//       let debugDiv = document.createElement("div");
-//       debugDiv.style.position = "absolute";
-//       debugDiv.style.top = 0;
-//       debugDiv.style.right = 0;
-//       debugDiv.style.backgroundColor = "lightgray";
-//       debugDiv.style.padding = "10px";
-//       canvas.appendChild(debugDiv);
-    
-//       // Display the debug history
-//       for (let i = 0; i < this.debugHistory.length; i++) {
-//         let p = document.createElement("p");
-//         p.innerHTML = this.debugHistory[i];
-//         debugDiv.appendChild(p);
-//       }
-//     }
-//   }
+        let lastLog;
+        this.historyLog.forEach((l, index) => {
+            if(l.id === id) {
+                lastLog = l;
+            }
+        });
+
+        return lastLog;
+    }
+
+    updateLastHistory(log){
+        let updated = false; 
+        this.historyLog.forEach((element, index) => {
+            if(element.id === log.id) {
+                this.historyLog[index] = log;
+                updated = true;
+            }
+        });
+
+        if( !updated ){
+            this.historyLog.push(log);
+        }
+    }
+
+    verifyNoChanges(v){
+        const oldLog = this.getLastLog(v.id);
+        if( !oldLog ){
+            return false;
+        }
+
+        if( v.x && oldLog.x  ){
+            let diff =  v.x.toFixed(2) - oldLog.x.toFixed(2);
+            diff = Math.abs( diff  ) - this.IGNORE_THRESHOLD;
+            if( diff <= 0 )
+                return true;            
+        }
+
+        return false;
+    }
+
+    log(log) {      
+        var timeDifference = Date.now() - this.currentTime;
+        if ( this.verifyNoChanges(log) || ((Date.now() - this.currentTime) <= (this.STEP * 1000)) ) {
+            this.updateLastHistory(log);
+            return;
+        }
+        this.currentTime = Date.now();
+        this.updateLastHistory(log);
+
+        let text = `${log.timestamp}: `;
+        if (log.type === "rectangle") {
+            text += `Rectangle - x: ${log.x}, y: ${log.y}, width: ${log.width}, height: ${log.height}`;
+        } else if (log.type === "circle") {
+            text += `Ball - x: ${log.x}, y: ${log.y}, radius: ${log.radius}`;
+        } else if (log.type === "SAT") {
+            text += `SAT - response: ${JSON.stringify(log.response)}`;
+        }
+
+        this.history.push({ raw: log, text: text} );
+
+        if (this.history.length > this.MAX_LOGS) {
+            this.history.shift();
+        }
+    }
+
+    update() {
+        if (!Globals.isDebug()) {
+            return ;
+        }
+        while (this.history.length > 0 && this.history.length > this.MAX_LOGS) {
+            this.history.shift();
+        }
+
+        this.debugDiv.innerHTML = this.history.map(x => x.text).join('<br>');
+
+        this.debugDiv.scrollTop = this.debugDiv.scrollHeight;
+    }
+
+    draw() {
+        // this.debugDiv.innerHTML = "";
+        // for (let i = this.history.length - 1; i >= 0; i--) {
+        //     this.debugDiv.innerHTML += `${this.history[i].output}<br>`;
+        // }
+    }
+}

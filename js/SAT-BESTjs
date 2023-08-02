@@ -1,5 +1,49 @@
 class SAT {
-    
+    static isColliding(rectA, rectB) {
+        const pointsA = SAT.getRotatedRectanglePoints(rectA);
+        const pointsB = SAT.getRotatedRectanglePoints(rectB);
+        const edgesA = SAT.getEdges(pointsA);
+        const edgesB = SAT.getEdges(pointsB);
+        const totalEdges = edgesA.length + edgesB.length;
+
+        // Check for overlap on the x axis
+        if (rectA.position.x + rectA.width / 2 < rectB.position.x - rectB.width / 2 || rectB.position.x + rectB.width / 2 < rectA.position.x - rectA.width / 2) {
+            return false;
+        }
+
+        // Check for overlap on the y axis
+        if (rectA.position.y + rectA.height / 2 < rectB.position.y - rectB.height / 2 || rectB.position.y + rectB.height / 2 < rectA.position.y - rectA.height / 2) {
+            return false;
+        }
+
+        for (let i = 0; i < totalEdges; i++) {
+            const edge = i < edgesA.length ? edgesA[i] : edgesB[i - edgesA.length];
+            const axis = SAT.getPerpendicular(edge);
+            const projectionA = SAT.getProjection(pointsA, axis);
+            const projectionB = SAT.getProjection(pointsB, axis);
+            const overlap = SAT.getOverlap(projectionA, projectionB);
+
+            if (overlap <= 0) {
+                return false;
+            }
+        }
+
+        return true;
+
+        // Check for overlap on all the axes of rectB
+        for (let i = 0; i < pointsB.length; i++) {
+            const axis = SAT.getPerpendicular(SAT.getEdge(pointsB, i));
+            const projectionA = SAT.getProjection(pointsA, axis);
+            const projectionB = SAT.getProjection(pointsB, axis);
+
+            if (!SAT.isOverlapping(projectionA, projectionB)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     static getEdges(points) {
         const edges = [];
         for (let i = 0; i < points.length; i++) {

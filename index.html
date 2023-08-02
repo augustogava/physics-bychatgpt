@@ -1,62 +1,105 @@
 <html>
 
 <head>
-  <style>
-    body {
-      margin: 0px;
-      padding: 0px;
-      overflow: hidden;
-      border: 4px solid rgb(29, 7, 7);
-    }
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+            border: 4px solid rgb(29, 7, 7);
+            scrollbar-width: thin;
+        }
 
-    #gameCanvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
 
-    .game-background {
-      background: linear-gradient(to bottom, #16222A, #3A6073);
-      /* height: 100vh;
-      width: 100vw;
-      display: flex;
-      align-items: center;
-      justify-content: center; */
-      box-shadow: inset 0 0 100px #000;
-    }
-  </style>
+        #debug::-webkit-scrollbar {
+            scrollbar-width: 5px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: darkgrey;
+            outline: 1px solid slategrey;
+        }
+
+        #debug {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background-color: rgba(255, 14, 14, 0.1);
+            padding: 10px;
+            font-size: 16px;
+            color: white;
+            z-index: 1;
+            overflow: auto;
+            height: 50%;
+            scrollbar-width: none;
+            display: none;
+        }
+
+        .game-background {
+            background: radial-gradient(ellipse at right bottom, #c333ff2e 5%, #ff00be26 24%, #00000000 50%, #0400ff40 116%);
+            box-shadow: inset 0 0 100px #000;
+            background-color: black;
+            /* height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center; */
+            box-shadow: inset 0 0 100px #000;
+            scrollbar-width: none;
+        }
+
+        #stopButton {
+            position: absolute;
+        }
+    </style>
 </head>
 
 <body class="game-background">
 
-  <canvas id="gameCanvas"></canvas>
 
-  <script src="js/Globals.js"></script>
-  <script src="js/Utils.js"></script>
-  <script src="js/Debug.js"></script>
-  <script src="js/MathHelper.js"></script>
 
-  <script src="js/Vector.js"></script>
-  <script src="js/Physics.js"></script>
-  <script src="js/PhysicsEngine.js"></script>
-  <script src="js/SAT.js"></script>
+    <canvas id="gameCanvas"></canvas>
+    <div id="debug"></div>
+]
 
-  <script src="js/Shape.js"></script>
-  <script src="js/Rectangle.js"></script>
-  <script src="js/Circle.js"></script>
+    <script src="js/Globals.js"></script>
+    <script src="js/Utils.js"></script>
+    <script src="js/Debug.js"></script>
+    <script src="js/MathHelper.js"></script>
 
-  <script src="js/MainGame.js"></script>
+    <script src="js/Vector.js"></script>
+    <script src="js/Physics.js"></script>
+    <script src="js/SAT.js"></script>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    <script src="js/Shape.js"></script>
+    <script src="js/Rectangle.js"></script>
+    <script src="js/Circle.js"></script>
 
-    let game = undefined;
-    window.onload = function () {
-      game = new MainGame();
-      game.init();
-    };
-  </script>
+    <script src="js/MainGame.js"></script>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let game = undefined;
+        window.onload = function () {
+            game = new MainGame();
+            game.init();
+        };
+    </script>
 
 </body>
 

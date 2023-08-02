@@ -3,6 +3,7 @@ class Physics {
     this.gravity = new Vector(0, 9.8);
     this.airResistence = .98;
     this.friction = .9;
+    this.restitution = .005;
     this.forces = [];
     this.mass = mass;
   }
@@ -24,10 +25,10 @@ class Physics {
   // Newton's 2nd law
   get acceleration() {
     const netForce = this.netForce;
-    return {
-      x: netForce.x / this.mass,
-      y: netForce.y / this.mass
-    };
+    return new Vector(
+      netForce.x / this.mass,
+      netForce.y / this.mass
+    );
   }
 
   // Newton's 3rd law
